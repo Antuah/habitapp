@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Habits = require('../services/habits.service');
+const { todayMX } = require('../utils/dates'); // importa el helper
+
 
 // Nota: para demo pasamos user_id por query/body (o monta un middleware de auth simple)
 
@@ -33,12 +35,25 @@ router.post('/:id/logs', async (req, res) => {
     const habitId = Number(req.params.id);
     const { date, amount } = req.body || {};
     if (!habitId) return res.status(400).json({ error: 'habit id inválido' });
-    const logDate = date || new Date().toISOString().slice(0, 10);
+    const logDate = date || todayMX();           
     await Habits.logHabit(habitId, logDate, Number(amount || 1));
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error registrando hábito' });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const habitId = Number(req.params.id);
+    if (!habitId) return res.status(400).json({ error: 'habit id inválido' });
+    const ok = await Habits.deleteHabitById(habitId);
+    if (!ok) return res.status(404).json({ error: 'No existe' });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error eliminando hábito' });
   }
 });
 

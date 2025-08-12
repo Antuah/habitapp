@@ -46,4 +46,13 @@ async function summary(userId, from, to) {
   return rows;
 }
 
-module.exports = { getHabits, findHabitByName, createHabit, deleteHabit, logHabit, summary };
+async function deleteHabitById(habitId) {
+  const [result] = await pool.query('DELETE FROM habits WHERE id = ?', [habitId]);
+  return result.affectedRows > 0;
+}
+module.exports = {
+  getHabits, findHabitByName, createHabit, deleteHabit, logHabit, summary,
+  deleteHabitById, // ← exporta
+};
+
+module.exports = { getHabits, findHabitByName, createHabit, deleteHabit, logHabit, summary, deleteHabitById };
