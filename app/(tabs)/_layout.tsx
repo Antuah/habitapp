@@ -1,43 +1,51 @@
+import { Feather, FontAwesome5, Foundation } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
-
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
+      screenOptions={{  
+        tabBarActiveTintColor: '#6C63FF', // Un color morado para la pestaña activa
+        tabBarInactiveTintColor: 'gray',
+        headerShown: false, 
+        tabBarStyle: {
+          backgroundColor: '#FFFFFF',
+          paddingBottom: 5,
+          height: 60,
+        },
       }}>
       <Tabs.Screen
-        name="index"
+        name="index" // Este es el archivo index.tsx
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Hoy',
+          headerShown: false, // Opcional: para ocultar el título de arriba
+          tabBarIcon: ({ color }) => <Foundation name="home" size={28} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="add" // Este es el archivo add.tsx
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Agregar',
+          headerShown: false,
+          tabBarIcon: ({ color }) => <Feather name="plus-square" size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="progress" // Este es el archivo progress.tsx
+        options={{
+          title: 'Progreso',
+          headerShown: false,
+          tabBarIcon: ({ color }) => <FontAwesome5 name="chart-line" size={24} color={color} />,
+        }}
+      />
+
+      <Tabs.Screen
+        // Apunta al archivo `app/(tabs)/explore.tsx`
+        name="Explorar"
+        options={{
+          title: 'Explorar',
+          tabBarIcon: ({ color }) => <FontAwesome5 name="compass" size={24} color={color} />,
         }}
       />
     </Tabs>

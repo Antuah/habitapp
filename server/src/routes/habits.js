@@ -71,4 +71,33 @@ router.get('/summary', async (req, res) => {
   }
 });
 
+router.get('/logs/by-date', async (req, res) => {
+  try {
+    const userId = Number(req.query.user_id);
+    const from = req.query.from;
+    const to = req.query.to;
+    if (!userId || !from || !to) return res.status(400).json({ error: 'user_id, from, to requeridos' });
+    const dates = await Habits.getLogsByDate(userId, from, to);
+    res.json(dates);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error en logs by-date' });
+  }
+});
+
+
+router.get('/logs/:date', async (req, res) => {
+  try {
+    const userId = Number(req.query.user_id);
+    const { date } = req.params;
+    if (!userId || !date) return res.status(400).json({ error: 'user_id y date requeridos' });
+    
+    const logs = await Habits.getLogForDate(userId, date);
+    res.json(logs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error obteniendo log para la fecha' });
+  }
+});
+
 module.exports = router;

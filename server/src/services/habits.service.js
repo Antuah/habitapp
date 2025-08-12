@@ -18,8 +18,8 @@ async function createHabit(userId, { name, goal_type, daily_goal = null }) {
   return { id: result.insertId, user_id: userId, name, goal_type, daily_goal };
 }
 
-async function deleteHabit(userId, name) {
-  const [result] = await pool.query('DELETE FROM habits WHERE user_id = ? AND LOWER(name) = LOWER(?)', [userId, name]);
+async function deleteHabitById(habitId) {
+  const [result] = await pool.query('DELETE FROM habits WHERE id = ?', [habitId]);
   return result.affectedRows > 0;
 }
 
@@ -46,13 +46,44 @@ async function summary(userId, from, to) {
   return rows;
 }
 
-async function deleteHabitById(habitId) {
-  const [result] = await pool.query('DELETE FROM habits WHERE id = ?', [habitId]);
-  return result.affectedRows > 0;
+// ESTA ES LA ÚNICA Y CORRECTA VERSIÓN DE LA FUNCIÓN
+async function getLogsByDate(userId, from, to) {
+  const [rows] = await pool.query(
+    `SELECT DISTINCT DATE_FORMAT(l.log_date, '%Y-%m-%d') as date 
+     FROM habit_logs l
+     JOIN habits h ON h.id = l.habit_id
+     WHERE h.user_id = ? AND l.log_date BETWEEN ? AND ?`,
+    [userId, from, to]
+  );
+  return rows.map(r => r.date);
 }
+
+async function getLogForDate(userId, date) {
+  const [rows] = await pool.query(
+    `SELECT h.name, h.daily_goal, l.amount 
+     FROM habits h
+     LEFT JOIN habit_logs l ON h.id = l.habit_id AND DATE(l.log_date) = ?
+     WHERE h.user_id = ?`,
+    [date, userId]
+  );
+  return rows;
+}
+
+// No olvides añadirlo al final en el module.exports
 module.exports = {
-  getHabits, findHabitByName, createHabit, deleteHabit, logHabit, summary,
-  deleteHabitById, // ← exporta
+  // ... (todas las funciones existentes)
+  getLogForDate,
 };
 
-module.exports = { getHabits, findHabitByName, createHabit, deleteHabit, logHabit, summary, deleteHabitById };
+
+// ESTE ES EL ÚNICO Y CORRECTO EXPORT, INCLUYENDO TODAS LAS FUNCIONES
+module.exports = {
+  getHabits,
+  findHabitByName,
+  createHabit,
+  deleteHabitById,
+  logHabit,
+  summary,
+  getLogForDate,
+  getLogsByDate, // <-- ¡AHORA SÍ ESTÁ INCLUIDA!
+};

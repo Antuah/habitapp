@@ -14,4 +14,15 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.get('/:id/streak', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await Users.calculateStreak(Number(id));
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error calculando la racha' });
+  }
+});
+
 module.exports = router;
